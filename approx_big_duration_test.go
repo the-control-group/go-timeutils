@@ -34,7 +34,7 @@ func TestParseApproxBigDuration(t *testing.T) {
 	}
 
 	for _, fixture := range fixtures {
-		err, d := ParseApproxBigDuration(fixture["bytes"].([]byte))
+		d, err := ParseApproxBigDuration(fixture["bytes"].([]byte))
 		if err != nil {
 			t.Error(err)
 		}

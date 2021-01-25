@@ -112,7 +112,7 @@ func (d *ApproxBigDuration) UnmarshalJSON(data []byte) error {
 	if bytes.Compare([]byte(`null`), bytes.ToLower(data)) == 0 {
 		return nil
 	}
-	err, _d := ParseApproxBigDuration(data)
+	_d, err := ParseApproxBigDuration(data)
 	if err != nil {
 		return err
 	}
@@ -120,70 +120,70 @@ func (d *ApproxBigDuration) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func ParseApproxBigDuration(data []byte) (error, ApproxBigDuration) {
+func ParseApproxBigDuration(data []byte) (ApproxBigDuration, error) {
 	var d ApproxBigDuration
 	if nanosPattern.Match(data) {
 		v, err := strconv.Atoi(string(nanosPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * time.Nanosecond)
 	}
 	if microsPattern.Match(data) {
 		v, err := strconv.Atoi(string(microsPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * time.Microsecond)
 	}
 	if millisPattern.Match(data) {
 		v, err := strconv.Atoi(string(millisPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * time.Millisecond)
 	}
 	if secsPattern.Match(data) {
 		v, err := strconv.Atoi(string(secsPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * time.Second)
 	}
 	if minsPattern.Match(data) {
 		v, err := strconv.Atoi(string(minsPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * time.Minute)
 	}
 	if hoursPattern.Match(data) {
 		v, err := strconv.Atoi(string(hoursPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * time.Hour)
 	}
 	if daysPattern.Match(data) {
 		v, err := strconv.Atoi(string(daysPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * Day)
 	}
 	if monthsPattern.Match(data) {
 		v, err := strconv.Atoi(string(monthsPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * Month)
 	}
 	if yearsPattern.Match(data) {
 		v, err := strconv.Atoi(string(yearsPattern.FindSubmatch(data)[1]))
 		if err != nil {
-			return err, d
+			return d, err
 		}
 		d += ApproxBigDuration(time.Duration(v) * Year)
 	}
-	return nil, d
+	return d, nil
 }
