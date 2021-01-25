@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	// "encoding/json"
 	"bytes"
+	"encoding/json"
 )
 
 type ApproxBigDuration time.Duration
@@ -186,4 +186,23 @@ func ParseApproxBigDuration(data []byte) (ApproxBigDuration, error) {
 		d += ApproxBigDuration(time.Duration(v) * Year)
 	}
 	return d, nil
+}
+
+func InterfaceToApproxBigDuration(i interface{}) (ApproxBigDuration, error) {
+	switch exp := i.(type) {
+	case []byte:
+		return ParseApproxBigDuration(exp)
+	case string:
+		return ParseApproxBigDuration([]byte(exp))
+	case int, int64, float64:
+		return ApproxBigDuration(exp.(int64)), nil
+	case json.Number:
+		_i, err := exp.Int64()
+		if err != nil {
+			return 0, err
+		}
+		return ApproxBigDuration(_i), nil
+	default:
+		return 0, fmt.Errorf("Could not convert type %T to ApproxBigDuration", exp)
+	}
 }
