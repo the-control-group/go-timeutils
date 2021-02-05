@@ -43,3 +43,39 @@ func TestParseApproxBigDuration(t *testing.T) {
 		}
 	}
 }
+
+func TestInterfaceToApproxBigDurationInt(t *testing.T) {
+	var value int = 5
+	var iface interface{} = value
+	d, err := InterfaceToApproxBigDuration(iface)
+	if err != nil {
+		t.Error(err)
+	}
+	if d.String() != "5ns" {
+		t.Errorf("Expected 5ns but got %s", d)
+	}
+}
+
+func TestInterfaceToApproxBigDurationFloat64(t *testing.T) {
+	var value float64 = 5
+	var iface interface{} = value
+	d, err := InterfaceToApproxBigDuration(iface)
+	if err != nil {
+		t.Error(err)
+	}
+	if d.String() != "5ns" {
+		t.Errorf("Expected 5ns but got %s", d)
+	}
+}
+
+func TestInterfaceToApproxBigDurationInt64(t *testing.T) {
+	var value int64 = 5
+	var iface interface{} = value
+	d, err := InterfaceToApproxBigDuration(iface)
+	if err != nil {
+		t.Error(err)
+	}
+	if d.String() != "5ns" {
+		t.Errorf("Expected 5ns but got %s", d)
+	}
+}

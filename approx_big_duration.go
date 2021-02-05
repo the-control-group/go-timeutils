@@ -188,14 +188,25 @@ func ParseApproxBigDuration(data []byte) (ApproxBigDuration, error) {
 	return d, nil
 }
 
+// InterfaceToApproxBigDuration handles converting various types
 func InterfaceToApproxBigDuration(i interface{}) (ApproxBigDuration, error) {
 	switch exp := i.(type) {
 	case []byte:
 		return ParseApproxBigDuration(exp)
 	case string:
 		return ParseApproxBigDuration([]byte(exp))
-	case int, int64, float64:
-		return ApproxBigDuration(exp.(int64)), nil
+	// case int, int32, int64, float64:
+	// 	return ApproxBigDuration(exp), nil
+	case int:
+		return ApproxBigDuration(exp), nil
+	case int32:
+		return ApproxBigDuration(exp), nil
+	case int64:
+		return ApproxBigDuration(exp), nil
+	case float32:
+		return ApproxBigDuration(exp), nil
+	case float64:
+		return ApproxBigDuration(exp), nil
 	case json.Number:
 		_i, err := exp.Int64()
 		if err != nil {
