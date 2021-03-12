@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"bytes"
@@ -16,6 +17,7 @@ const Day = time.Hour * 24
 const Month = Day * 30
 const Year = Month * 12
 
+var negativePattern = regexp.MustCompile("^(~ )?-")
 var nanosPattern = regexp.MustCompile("(\\d)+ ?(?:ns|nanos|nanosecond|nanoseconds)")
 var microsPattern = regexp.MustCompile("(\\d)+ ?(?:µ|µs|ns|nanos|nanosecond|nanoseconds)")
 var millisPattern = regexp.MustCompile("(\\d)+ ?(?:ms)")
@@ -46,6 +48,9 @@ func (d ApproxBigDuration) ApproxString() string {
 }
 
 func (d ApproxBigDuration) String() string {
+	if d < 0 {
+		return "-" + (-d).String()
+	}
 	switch {
 	case time.Duration(d) < 4*Day:
 		return time.Duration(d).String()
@@ -53,21 +58,24 @@ func (d ApproxBigDuration) String() string {
 		var days = int64(float64(d) / float64(Day))
 		var hours = (int64(d) - (days * int64(Day))) / int64(time.Hour)
 		var remainder = time.Duration(int64(d) - (days * int64(Day)) - (hours * int64(time.Hour)))
-		return fmt.Sprintf("%dd%dh %s", days, hours, remainder)
+		return fmt.Sprintf("%dd%dh%s", days, hours, remainder)
 	case time.Duration(d) < 12*Month:
 		var months = int64(float64(d) / float64(Month))
 		var days = int64(int64(d)-(months*int64(Month))) / int64(Day)
 		var remainder = time.Duration(int64(d) - (months * int64(Month)) - (days * int64(Day)))
-		return fmt.Sprintf("%dmo%dd %s", months, days, remainder)
+		return fmt.Sprintf("%dmo%dd%s", months, days, remainder)
 	default:
 		var years = int64(float64(d) / float64(Year))
 		var months = int64(int64(d)-(years*int64(Year))) / int64(Month)
 		var remainder = time.Duration(int64(d) - (years * int64(Year)) - (months * int64(Month)))
-		return fmt.Sprintf("%dy%dmo %s", years, months, remainder)
+		return fmt.Sprintf("%dy%dmo%s", years, months, remainder)
 	}
 }
 
 func (d ApproxBigDuration) Pretty() string {
+	if d < 0 {
+		return "- " + (-d).Pretty()
+	}
 	switch {
 	case time.Duration(d) < 4*Day:
 		return time.Duration(d).String()
@@ -90,6 +98,9 @@ func (d ApproxBigDuration) Pretty() string {
 }
 
 func (d ApproxBigDuration) ApproxPretty() string {
+	if d < 0 {
+		return strings.Replace((-d).ApproxPretty(), "~ ", "~ -", 1)
+	}
 	switch {
 	case time.Duration(d) < 4*Day:
 		return time.Duration(d).String()
@@ -120,6 +131,7 @@ func (d *ApproxBigDuration) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// ParseApproxBigDuration parses a string for an approximate duration string
 func ParseApproxBigDuration(data []byte) (ApproxBigDuration, error) {
 	var d ApproxBigDuration
 	if nanosPattern.Match(data) {
@@ -185,10 +197,14 @@ func ParseApproxBigDuration(data []byte) (ApproxBigDuration, error) {
 		}
 		d += ApproxBigDuration(time.Duration(v) * Year)
 	}
+	if negativePattern.Match(data) {
+		d = -1 * d
+	}
 	return d, nil
 }
 
 // InterfaceToApproxBigDuration handles converting various types
+// Can be used as a template function
 func InterfaceToApproxBigDuration(i interface{}) (ApproxBigDuration, error) {
 	switch exp := i.(type) {
 	case []byte:
