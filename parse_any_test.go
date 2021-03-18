@@ -41,3 +41,14 @@ func TestParseAny(t *testing.T) {
 		}
 	}
 }
+
+func TestParseAnyMaybe(t *testing.T) {
+	for name, format := range TestFormats {
+		p := ParseAnyMaybe(format)
+		if p == nil {
+			t.Error(name, format)
+		} else {
+			t.Log(p.Unix(), name, format)
+		}
+	}
+}

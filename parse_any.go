@@ -40,3 +40,13 @@ func ParseAny(timeString string) (t time.Time, err error) {
 	}
 	return t, fmt.Errorf("No matching layout for time string")
 }
+
+func ParseAnyMaybe(timeString string) (t *time.Time) {
+	for _, layout := range ParseAnyLayouts {
+		t, err := time.Parse(layout, timeString)
+		if err == nil {
+			return &t
+		}
+	}
+	return nil
+}
