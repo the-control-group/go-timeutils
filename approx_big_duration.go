@@ -119,6 +119,10 @@ func (d ApproxBigDuration) ApproxPretty() string {
 	}
 }
 
+func (d ApproxBigDuration) Seconds() float64 {
+	return time.Duration(d).Seconds()
+}
+
 func (d *ApproxBigDuration) UnmarshalJSON(data []byte) error {
 	if bytes.Compare([]byte(`null`), bytes.ToLower(data)) == 0 {
 		return nil
