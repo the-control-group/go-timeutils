@@ -1,6 +1,8 @@
 package timeutils
 
 import (
+	"bytes"
+	"encoding/json"
 	"testing"
 	"time"
 )
@@ -13,6 +15,7 @@ var testFixtures = []struct {
 	NegativeString       string
 	NegativePretty       string
 	NegativeApproxPretty string
+	Json                 string
 }{
 	{
 		String:               `15m`,
@@ -22,6 +25,17 @@ var testFixtures = []struct {
 		NegativeString:       `-15m`,
 		NegativePretty:       `-15m`,
 		NegativeApproxPretty: `-15m`,
+		Json:                 `"15m0s"`,
+	},
+	{
+		String:               `15 minutes`,
+		Pretty:               `15 minutes`,
+		ApproxPretty:         `15 minutes`,
+		Duration:             15 * time.Minute,
+		NegativeString:       `-15 minutes`,
+		NegativePretty:       `-15 minutes`,
+		NegativeApproxPretty: `-15 minutes`,
+		Json:                 `"15m0s"`,
 	},
 	{
 		String:               `11h`,
@@ -31,6 +45,7 @@ var testFixtures = []struct {
 		NegativeString:       `-11h`,
 		NegativePretty:       `-11h`,
 		NegativeApproxPretty: `-11h`,
+		Json:                 `"11h0m0s"`,
 	},
 	{
 		String:               `1d1h`,
@@ -40,6 +55,7 @@ var testFixtures = []struct {
 		NegativeString:       `-1d1h`,
 		NegativePretty:       `-1 days, 1 hours`,
 		NegativeApproxPretty: `~ -1 days, 1 hours`,
+		Json:                 `"25h0m0s"`,
 	},
 	{
 		String:               `6d2h5s`,
@@ -49,6 +65,7 @@ var testFixtures = []struct {
 		NegativeString:       `-6d2h5s`,
 		NegativePretty:       `-6 days, 2 hours 5s`,
 		NegativeApproxPretty: `~ -6 days, 2 hours 5s`,
+		Json:                 `"6d2h5s"`,
 	},
 	{
 		String:               `13s`,
@@ -58,6 +75,7 @@ var testFixtures = []struct {
 		NegativeString:       `-13s`,
 		NegativePretty:       `-13s`,
 		NegativeApproxPretty: `-13s`,
+		Json:                 `"13s"`,
 	},
 	{
 		String:               `3mos`,
@@ -67,6 +85,7 @@ var testFixtures = []struct {
 		NegativeString:       `-3mos`,
 		NegativePretty:       `-3 months`,
 		NegativeApproxPretty: `~ -3 months`,
+		Json:                 `"3mo0d0s"`,
 	},
 	{
 		String:               `3mo`,
@@ -76,6 +95,7 @@ var testFixtures = []struct {
 		NegativeString:       `-3mo`,
 		NegativePretty:       `-3 months`,
 		NegativeApproxPretty: `~ -3 months`,
+		Json:                 `"3mo0d0s"`,
 	},
 }
 
@@ -133,6 +153,16 @@ func TestApproxBigDuration(t *testing.T) {
 			}
 			if time.Duration(d) != -fixture.Duration {
 				t.Errorf("parsed duration %s is %d (%s) instead of %d. Diff by %d seconds", fixture.NegativeApproxPretty, d, d.Pretty(), -fixture.Duration, (time.Duration(d)+fixture.Duration)/time.Second)
+			}
+		}
+		{
+			d := ApproxBigDuration(fixture.Duration)
+			b, err := json.Marshal(&d)
+			if err != nil {
+				t.Error(err)
+			}
+			if bytes.Compare(b, []byte(fixture.Json)) != 0 {
+				t.Errorf("json encoded duration is %s instead of %s", b, fixture.Json)
 			}
 		}
 		// {

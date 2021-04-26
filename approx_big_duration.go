@@ -135,6 +135,10 @@ func (d *ApproxBigDuration) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (d ApproxBigDuration) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", d.String())), nil
+}
+
 // ParseApproxBigDuration parses a string for an approximate duration string
 func ParseApproxBigDuration(data []byte) (ApproxBigDuration, error) {
 	var d ApproxBigDuration
