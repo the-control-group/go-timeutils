@@ -27,6 +27,7 @@ var ParseAnyLayouts = []string{
 	time.StampMicro,           // "Jan _2 15:04:05.000000"
 	time.StampNano,            // "Jan _2 15:04:05.000000000"
 	"2006-01-02 15:04:05Z",
+	"2006-01-02 15:04:05.000",
 }
 
 // ParseAny attempts to parse the given string in a collection of known formats

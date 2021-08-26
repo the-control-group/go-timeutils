@@ -29,6 +29,7 @@ var TestFormats = map[string]string{
 	"$.event.created 01":        "2020-12-01T00:00:21+00:00",
 	"$.event.created 02":        "2020-12-01T00:19:51.481Z",
 	"$.event.created 03":        "2020-12-01 23:05:36Z",
+	"$.event.created 04":        "2020-12-01 23:05:36.000",
 }
 
 func TestParseAny(t *testing.T) {
